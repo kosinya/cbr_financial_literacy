@@ -1,11 +1,15 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from user.router import router as UserRouter
+import config
+from user.router import router as user_router
+from news.router import router as news_router
+
 
 app = FastAPI()
-
+app.mount("/static", StaticFiles(directory=config.STATIC_DIR), name="static")
 
 @app.get('/')
 async def welcome():
@@ -21,7 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(UserRouter, prefix='/user')
+app.include_router(user_router, prefix='/user')
+app.include_router(news_router, prefix='/news')
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
