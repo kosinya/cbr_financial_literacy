@@ -1,8 +1,17 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
+
+from user import service, schemas
+from database import get_async_session
 router = APIRouter()
 
 
-@router.post("/auth", tags=["user"])
-def user_auth(init_data: str):
-    return JSONResponse(status_code=status.HTTP_200_OK, content=init_data)
+@router.get("/login", tags=["auth"])
+async def login(init_data: str = Depends(), session: AsyncSession = Depends(get_async_session)):
+    return await service.login(init_data=init_data, session=session)
+
+
+@router.post('/registration', tags=["auth"])
+async def registration(user_data: schemas.User = Depends(), session: AsyncSession = Depends(get_async_session)):
+    return await service.registration(user_data, session)

@@ -25,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(user_router, prefix='/user')
+app.include_router(user_router, prefix='/auth')
 app.include_router(news_router, prefix='/news')
 
 if __name__ == "__main__":

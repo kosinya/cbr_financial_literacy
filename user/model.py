@@ -11,6 +11,7 @@ class User(Base):
     surname = Column(String(), nullable=False)
     name = Column(String(), nullable=False)
     patronymic = Column(String())
+    tg_username = Column(String(), nullable=False)
     age = Column(Integer(), nullable=False)
     region = Column(String(), nullable=False)
     is_admin = Column(Boolean(), default=False, nullable=False)
