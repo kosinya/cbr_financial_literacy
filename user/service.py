@@ -7,6 +7,7 @@ from urllib import parse
 
 from user import model, schemas
 
+
 def init_data_parsing(init_data: str):
     try:
         decoded_data = parse.unquote(init_data)
@@ -27,19 +28,22 @@ async def checking_registration(tg_id: int, session: AsyncSession):
 
 
 async def login(init_data: str, session: AsyncSession):
-     user_data = init_data_parsing(init_data)
-     user = await checking_registration(user_data['tg_id'], session)
-     if not user:
-         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                             detail=f"The user with tg_id = {user_data.tg_id} is not registered")
-     return user
-
+    user_data = init_data_parsing(init_data)
+    print(user_data)
+    user = await checking_registration(user_data['id'], session)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                             detail=f"The user with tg_id = {user_data['id']} is not registered")
+    return user
 
 
 async def registration(user_data: schemas.User, session: AsyncSession):
-    if not await checking_registration(user_data.tg_id, session):
+    check = await checking_registration(user_data.tg_id, session)
+    print(check)
+    if check:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=f"User with th_id = {user_data.tg_id} is already registered")
+
     new_user = model.User(
         tg_id=user_data.tg_id,
         surname=user_data.surname,
@@ -58,4 +62,8 @@ async def registration(user_data: schemas.User, session: AsyncSession):
         await session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-    return new_user
+    return {
+        "surname": new_user.surname,
+        "name": new_user.name,
+        "patronymic": new_user.patronymic,
+    }

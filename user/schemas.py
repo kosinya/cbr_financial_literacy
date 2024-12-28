@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class User(BaseModel):
     tg_id: int = Field(...)
     surname: str = Field(...)
