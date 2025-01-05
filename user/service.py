@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from starlette.responses import JSONResponse
+from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import json
@@ -23,13 +23,11 @@ async def checking_registration(tg_id: int, session: AsyncSession):
     user = result.scalars().first()
     if not user:
         return False
-    return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=user)
+    return user
 
 
 async def login(init_data: str, session: AsyncSession):
     user_data = init_data_parsing(init_data)
-    print(user_data)
     user = await checking_registration(user_data['id'], session)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -37,19 +35,19 @@ async def login(init_data: str, session: AsyncSession):
     return user
 
 
-async def registration(user_data: schemas.User, session: AsyncSession):
-    check = await checking_registration(user_data.tg_id, session)
-    print(check)
-    if check:
+async def registration(user_data: schemas.User = Depends(), session: AsyncSession = None):
+    parsed_data = init_data_parsing(user_data.initData)
+    user = await checking_registration(parsed_data['id'], session)
+    if user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f"User with th_id = {user_data.tg_id} is already registered")
+                            detail=f"User with tg_id = {user.tg_id} is already registered")
 
     new_user = model.User(
-        tg_id=user_data.tg_id,
+        tg_id=parsed_data['id'],
         surname=user_data.surname,
         name=user_data.name,
         patronymic=user_data.patronymic,
-        tg_username=user_data.tg_username,
+        tg_username=parsed_data['username'],
         age=user_data.age,
         region=user_data.region,
         is_admin=False,
@@ -62,8 +60,4 @@ async def registration(user_data: schemas.User, session: AsyncSession):
         await session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-    return {
-        "surname": new_user.surname,
-        "name": new_user.name,
-        "patronymic": new_user.patronymic,
-    }
+    return new_user
