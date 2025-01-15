@@ -47,7 +47,6 @@ async def registration(user_data: schemas.User = Depends(), session: AsyncSessio
         surname=user_data.surname,
         name=user_data.name,
         patronymic=user_data.patronymic,
-        tg_username=parsed_data['username'],
         age=user_data.age,
         region=user_data.region,
         is_admin=False,
