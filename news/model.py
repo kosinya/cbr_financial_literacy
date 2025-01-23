@@ -11,5 +11,6 @@ class News(Base):
     description = Column(String())
     content = Column(String(), nullable=False)
     image_url = Column(String())
+    test_url = Column(String())
     is_event = Column(Boolean(), default=False)
     tags = Column(String(), nullable=False)
