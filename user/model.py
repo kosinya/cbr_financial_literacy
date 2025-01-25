@@ -13,5 +13,6 @@ class User(Base):
     patronymic = Column(String())
     age = Column(Integer(), nullable=False)
     region = Column(String(), nullable=False)
+    education = Column(String())
     is_admin = Column(Boolean(), default=False, nullable=False)
     is_active = Column(Boolean(), default=True, nullable=False)

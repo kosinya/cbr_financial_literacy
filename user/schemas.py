@@ -8,3 +8,4 @@ class User(BaseModel):
     patronymic: str = Field(...)
     age: int = Field(...)
     region: str = Field(...)
+    education: str = Field(...)
