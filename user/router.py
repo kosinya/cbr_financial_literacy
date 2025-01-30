@@ -15,3 +15,8 @@ async def login(init_data: str, session: AsyncSession = Depends(get_async_sessio
 @router.post('/registration', tags=["auth"])
 async def registration(user_data: schemas.User, session: AsyncSession = Depends(get_async_session)):
     return await service.registration(user_data=user_data, session=session)
+
+
+@router.put('/update', tags=["auth"])
+async def update_user(user_data: schemas.User, session: AsyncSession = Depends(get_async_session)):
+    return await service.update_user(user_data=user_data, session=session)

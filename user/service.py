@@ -61,3 +61,28 @@ async def registration(user_data: schemas.User = Depends(), session: AsyncSessio
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     return new_user
+
+
+async def update_user(user_data: schemas.User = Depends(), session: AsyncSession = None):
+    parsed_data = init_data_parsing(user_data.initData)
+    user = await checking_registration(parsed_data['id'], session)
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"The user with tg_id = {parsed_data['id']} is not registered")
+
+    user.surname = user_data.surname
+    user.name = user_data.name
+    user.patronymic = user_data.patronymic
+    user.age = user_data.age
+    user.region = user_data.region
+    user.education = user_data.education
+
+    session.add(user)
+    try:
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+    return user
