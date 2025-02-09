@@ -8,6 +8,7 @@ from alembic import context
 from database import Base
 from news.model import News
 from user.model import User
+from events.model import Event
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
